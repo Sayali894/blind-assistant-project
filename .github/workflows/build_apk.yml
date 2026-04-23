@@ -22,7 +22,7 @@ jobs:
           flutter-version: '3.19.0'
           channel: 'stable'
 
-      - name: Download YOLOv8n TFLite model (pre-built)
+      - name: Download YOLOv8n TFLite model
         run: |
           mkdir -p assets
           curl -L "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolov8n_float32.tflite" \
