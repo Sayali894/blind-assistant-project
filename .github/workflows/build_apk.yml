@@ -116,18 +116,20 @@ jobs:
 
       - name: Patch flutter_vision namespace (AGP 8 fix)
         run: |
-          FLUTTER_VISION_DIR=$(find $HOME/.pub-cache -type d -name "flutter_vision*" 2>/dev/null | head -1)
-          echo "Found: $FLUTTER_VISION_DIR"
-          if [ -n "$FLUTTER_VISION_DIR" ]; then
-            BUILD_GRADLE="$FLUTTER_VISION_DIR/android/build.gradle"
-            if ! grep -q "namespace" "$BUILD_GRADLE"; then
-              sed -i 's/^android {/android {\n    namespace "com.hvt.flutter_vision"/' "$BUILD_GRADLE"
-              echo "Patched successfully"
-              cat "$BUILD_GRADLE"
+          echo "=== Searching for flutter_vision build.gradle files ==="
+          find $HOME/.pub-cache -path "*flutter_vision*" -name "build.gradle" 2>/dev/null | while read f; do
+            echo "Found: $f"
+            if ! grep -q "namespace" "$f"; then
+              # Extract package name from the file or use default
+              PKG=$(grep -oP '(?<=applicationId |namespace )["\x27][^\x27"]+["\x27]' "$f" | head -1 | tr -d '"'"'" || echo '"com.hvt.flutter_vision"')
+              sed -i 's/^android {/android {\n    namespace "com.hvt.flutter_vision"/' "$f"
+              echo "Patched: $f"
             else
-              echo "Already has namespace"
+              echo "Already has namespace: $f"
             fi
-          fi
+            cat "$f"
+            echo "---"
+          done
 
       - name: Accept Android licenses
         run: yes | flutter doctor --android-licenses || true
