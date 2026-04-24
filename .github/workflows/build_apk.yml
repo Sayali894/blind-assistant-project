@@ -28,7 +28,7 @@ jobs:
           curl -L "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolov8n_float32.tflite" \
             -o assets/models/yolov8n.tflite
           echo "Model size: $(du -sh assets/models/yolov8n.tflite)"
-          cat > assets/models/labels.txt << 'EOF'
+          cat > assets/models/labels.txt << 'LABELS_EOF'
           person
           bicycle
           car
@@ -109,10 +109,25 @@ jobs:
           teddy bear
           hair drier
           toothbrush
-          EOF
+          LABELS_EOF
 
       - name: Install Flutter dependencies
         run: flutter pub get
+
+      - name: Patch flutter_vision namespace (AGP 8 fix)
+        run: |
+          FLUTTER_VISION_DIR=$(find $HOME/.pub-cache -type d -name "flutter_vision*" 2>/dev/null | head -1)
+          echo "Found: $FLUTTER_VISION_DIR"
+          if [ -n "$FLUTTER_VISION_DIR" ]; then
+            BUILD_GRADLE="$FLUTTER_VISION_DIR/android/build.gradle"
+            if ! grep -q "namespace" "$BUILD_GRADLE"; then
+              sed -i 's/^android {/android {\n    namespace "com.hvt.flutter_vision"/' "$BUILD_GRADLE"
+              echo "Patched successfully"
+              cat "$BUILD_GRADLE"
+            else
+              echo "Already has namespace"
+            fi
+          fi
 
       - name: Accept Android licenses
         run: yes | flutter doctor --android-licenses || true
