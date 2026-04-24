@@ -22,12 +22,94 @@ jobs:
           flutter-version: '3.19.0'
           channel: 'stable'
 
-      - name: Download YOLOv8n TFLite model
+      - name: Download YOLOv8n TFLite model and create labels
         run: |
-          mkdir -p assets
+          mkdir -p assets/models
           curl -L "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolov8n_float32.tflite" \
-            -o assets/yolov8n.tflite
-          echo "Model size: $(du -sh assets/yolov8n.tflite)"
+            -o assets/models/yolov8n.tflite
+          echo "Model size: $(du -sh assets/models/yolov8n.tflite)"
+          cat > assets/models/labels.txt << 'EOF'
+          person
+          bicycle
+          car
+          motorcycle
+          airplane
+          bus
+          train
+          truck
+          boat
+          traffic light
+          fire hydrant
+          stop sign
+          parking meter
+          bench
+          bird
+          cat
+          dog
+          horse
+          sheep
+          cow
+          elephant
+          bear
+          zebra
+          giraffe
+          backpack
+          umbrella
+          handbag
+          tie
+          suitcase
+          frisbee
+          skis
+          snowboard
+          sports ball
+          kite
+          baseball bat
+          baseball glove
+          skateboard
+          surfboard
+          tennis racket
+          bottle
+          wine glass
+          cup
+          fork
+          knife
+          spoon
+          bowl
+          banana
+          apple
+          sandwich
+          orange
+          broccoli
+          carrot
+          hot dog
+          pizza
+          donut
+          cake
+          chair
+          couch
+          potted plant
+          bed
+          dining table
+          toilet
+          tv
+          laptop
+          mouse
+          remote
+          keyboard
+          cell phone
+          microwave
+          oven
+          toaster
+          sink
+          refrigerator
+          book
+          clock
+          vase
+          scissors
+          teddy bear
+          hair drier
+          toothbrush
+          EOF
 
       - name: Install Flutter dependencies
         run: flutter pub get
